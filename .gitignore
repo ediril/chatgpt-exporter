@@ -1,0 +1,11 @@
+_**_/
+venv/
+img/
+_originals/
+content/
+vendor/
+
+.DS_Store
+*.db*
+*.log
+ftp_config.yaml
