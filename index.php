@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT Exporter</title>
+    <title>ChatGPT Conversation Exporter</title>
     <style>
         * {
             margin: 0;
@@ -283,7 +283,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>ChatGPT Exporter</h1>
+            <h1>ChatGPT Conversation Exporter</h1>
             <p>Save and print your ChatGPT conversations as clean PDFs</p>
         </div>
 
