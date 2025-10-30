@@ -284,22 +284,29 @@
     <div class="container">
         <div class="header">
             <h1>ChatGPT Conversation Exporter</h1>
-            <p>Save and print your ChatGPT conversations as clean PDFs</p>
+            <p>Export your ChatGPT conversations as clean PDFs or HTML</p>
         </div>
 
         <div class="content">
             <div class="step">
                 <h2>
                     <span class="step-number">1</span>
-                    Install the Bookmarklet
+                    Install the Bookmarklets
                 </h2>
-                <p>Drag this button to your browser's bookmarks bar:</p>
+                <p>Drag one or both buttons to your browser's bookmarks bar:</p>
                 <br>
                 <?php
-                $bookmarkletCode = "javascript:(function(){scrollTo(0,9e9);scrollTo(0,0);setTimeout(function(){var w=open(''),m=document.querySelector('main'),c=m.cloneNode(true),s=[];c.querySelectorAll('img').forEach(function(img){var src=img.src||img.dataset.src||img.getAttribute('data-src')||img.getAttribute('src')||'';if(src&&src.length>10&&!src.includes('data:image/svg')){if(s.includes(src)){img.remove()}else{s.push(src);img.style.cssText='max-width:400px!important;height:auto!important;border-radius:8px;margin:10px 0!important;display:block!important'}}});c.querySelectorAll('button').forEach(function(btn){if(btn.querySelector('img')&&!btn.textContent.includes('Sources')){var img=btn.querySelector('img');if(img){var d=document.createElement('div');d.style.cssText='margin:10px 0!important;padding:0!important;';d.appendChild(img.cloneNode(true));btn.parentNode.insertBefore(d,btn);btn.remove()}}});c.querySelectorAll('button:not(:has(img)),[role=button]:not(:has(img)),svg:not(:has(image))').forEach(function(e){e.remove()});c.querySelectorAll('[data-state=closed],span[data-state=closed]').forEach(function(e){if(e.textContent.includes('Thought for')||e.textContent.includes('seconds')||!e.textContent.trim()){e.remove()}});c.querySelectorAll('.relative.my-1,.pb-3,.pb-2').forEach(function(e){var hasImg=e.querySelector('img');var hasText=e.textContent.trim().length>10;if(hasImg&&!hasText){var img=e.querySelector('img');if(img){var d=document.createElement('div');d.style.cssText='margin:10px 0!important;padding:0!important;';d.appendChild(img.cloneNode(true));e.parentNode.replaceChild(d,e)}}else if(!hasText&&!hasImg){e.remove()}});c.querySelectorAll('*').forEach(function(e){if(e.textContent&&(e.textContent.includes('Thought for')||e.textContent.includes('seconds')||e.textContent.includes('Image created'))&&!e.querySelector('img')){e.style.cssText='height:auto!important;min-height:0!important;max-height:none!important;padding:2px 0!important;margin:2px 0!important;overflow:visible!important'}});c.querySelectorAll('button').forEach(function(e){if(e.textContent.includes('Sources')&&e.querySelector('img[src*=\"s2/favicons\"]')){var flexDiv=e.querySelector('.flex.flex-row-reverse');if(flexDiv){flexDiv.style.cssText='display:flex!important;flex-direction:row!important;gap:3px!important;'}}});c.querySelectorAll('a[href]').forEach(function(a){if(a.href.startsWith('http')){a.style.cssText='background:#d1d5db!important;color:#1f2937!important;text-decoration:none!important;padding:1px 4px!important;border-radius:6px!important;font-size:0.75rem!important;display:inline-block!important;margin:2px!important;font-weight:500!important;border:1px solid #9ca3af!important;'}});w.document.write('<!DOCTYPE html><head><style>*{-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:20px;line-height:1.6;color:#374151}img{max-width:400px!important;height:auto!important;border-radius:8px;margin:10px 0!important;display:block!important}pre{background:#f3f4f6;padding:12px;border-radius:6px}code{background:#f3f4f6;padding:2px 6px;border-radius:4px}.whitespace-pre-wrap{white-space:pre-wrap}a[href^=\"http\"]{background:#d1d5db!important;color:#1f2937!important;text-decoration:none!important;padding:1px 4px!important;border-radius:6px!important;font-size:0.75rem!important;display:inline-block!important;margin:2px!important;font-weight:500!important;border:1px solid #9ca3af!important;-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}a[href^=\"http\"]:hover{background:#9ca3af!important}@media print{*{-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}img{max-width:350px!important}a[href^=\"http\"]{background:#d1d5db!important;border:1px solid #9ca3af!important;-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}}</style></head><body><h1>ChatGPT Conversation</h1><p>Exported: '+new Date().toLocaleString()+'</p><hr>'+c.innerHTML+'</body></html>');w.document.close();w.print()},1000)})();";
+                $bookmarkletCode = @file_get_contents(__DIR__ . '/pdf_bookmarklet.js');
                 ?>
-                <a href="<?php echo htmlspecialchars($bookmarkletCode); ?>" class="bookmarklet">
-                    Export ChatGPT to PDF
+                <a href="<?php echo htmlspecialchars(trim($bookmarkletCode)); ?>" class="bookmarklet">
+                     Export ChatGPT to PDF
+                </a>
+                <br><br>
+                <?php
+                $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/html_bookmarklet.js');
+                ?>
+                <a href="<?php echo htmlspecialchars(trim($bookmarkletHtmlCode)); ?>" class="bookmarklet">
+                    Export ChatGPT to HTML
                 </a>
             </div>
 
@@ -308,12 +315,12 @@
                     <span class="step-number">2</span>
                     Use the Bookmarklet
                 </h2>
-                <p>Navigate to any ChatGPT conversation and click the bookmarklet in your bookmarks bar. The tool will:</p>
+                <p>Navigate to any ChatGPT conversation and click either bookmarklet in your bookmarks bar. The tool will:</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
                     <li>Clean up the page formatting</li>
                     <li>Remove unnecessary UI elements</li>
                     <li>Optimize images for printing</li>
-                    <li>Open a print-ready version in a new window</li>
+                    <li>Prepare a clean export for saving or printing</li>
                 </ul>
             </div>
 
@@ -322,10 +329,10 @@
                     <span class="step-number">3</span>
                     Save or Print
                 </h2>
-                <p>The print dialog will automatically open. You can:</p>
+                <p>Depending on which bookmarklet you used, you can:</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
-                    <li><strong>Save as PDF:</strong> Choose "Save as PDF" in the destination</li>
-                    <li><strong>Print:</strong> Select your printer and print directly</li>
+                    <li><strong>Export to HTML:</strong> A self-contained <code>.html</code> file downloads to your computer</li>
+                    <li><strong>Export to PDF:</strong> A print dialog opens; choose "Save as PDF" or print directly</li>
                 </ul>
             </div>
 
