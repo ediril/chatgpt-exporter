@@ -1,11 +1,5 @@
-_**_/
-venv/
-img/
-_originals/
-content/
-vendor/
+node_modules/
+dist/
 
 .DS_Store
-*.db*
-*.log
-ftp_config.yaml
+.claude/

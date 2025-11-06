@@ -296,14 +296,14 @@
                 <p>Drag one or both buttons to your browser's bookmarks bar:</p>
                 <br>
                 <?php
-                $bookmarkletCode = @file_get_contents(__DIR__ . '/pdf_bookmarklet.js');
+                $bookmarkletCode = @file_get_contents(__DIR__ . '/dist/pdf_bookmarklet.js');
                 ?>
                 <a href="<?php echo htmlspecialchars(trim($bookmarkletCode)); ?>" class="bookmarklet">
                      Export ChatGPT to PDF
                 </a>
                 <br><br>
                 <?php
-                $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/html_bookmarklet.js');
+                $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/dist/html_bookmarklet.js');
                 ?>
                 <a href="<?php echo htmlspecialchars(trim($bookmarkletHtmlCode)); ?>" class="bookmarklet">
                     Export ChatGPT to HTML
