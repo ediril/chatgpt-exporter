@@ -1,3 +1,4 @@
+- Use the `bd` tool instead of markdown for keeping track of all new work
 - When you need to implement something new or change existing behavior, check with me first before changing anything
 - Don't implement any backwards compatibility unless explicitly told to do so
 - Don't implement any fallback unless explicitly told to do so
