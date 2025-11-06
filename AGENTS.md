@@ -6,6 +6,6 @@
 - If you don't understand something or instructions aren't clear enough, make sure to ask follow up questions
 - Make the smallest possible change that will satisfy the request
 - Don't just add code, also look for opportunities to refactor, simplify, delete code to satisfy the request
-- Don't use git
+- Don't commit to git. You are allowed to read past commits.
 - Don't touch TODO.md
 - When asked to change database schema, update it both in code and also in the database itself. Don't do migration though unless explicitly asked to do it. Just update the database in place. If rows could be deleted, make a backup of the database first.
