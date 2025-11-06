@@ -53,9 +53,12 @@ files.forEach(({ input, output }) => {
     // Read the source file
     const code = fs.readFileSync(inputPath, 'utf8');
 
-    // Extract javascript: prefix if present
-    const hasPrefix = code.startsWith('javascript:');
-    const codeToObfuscate = hasPrefix ? code.substring('javascript:'.length) : code;
+    // Find javascript: prefix (may be after comments)
+    const jsIndex = code.indexOf('javascript:');
+    const hasPrefix = jsIndex !== -1;
+
+    // Extract code to obfuscate (everything after 'javascript:')
+    const codeToObfuscate = hasPrefix ? code.substring(jsIndex + 'javascript:'.length) : code;
 
     // Obfuscate
     const obfuscationResult = JavaScriptObfuscator.obfuscate(codeToObfuscate, obfuscatorOptions);
