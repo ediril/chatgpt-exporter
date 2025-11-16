@@ -124,6 +124,7 @@
             color: white;
             text-decoration: none;
             padding: 15px 30px;
+            margin-right: 20px;
             border-radius: 10px;
             font-weight: 600;
             font-size: 1.1rem;
@@ -301,7 +302,6 @@
                 <a href="<?php echo htmlspecialchars(trim($bookmarkletCode)); ?>" class="bookmarklet">
                      Export ChatGPT to PDF
                 </a>
-                <br><br>
                 <?php
                 $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/dist/html_bookmarklet.js');
                 ?>
