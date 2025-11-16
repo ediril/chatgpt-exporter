@@ -69,15 +69,23 @@ javascript:(function() {
         // Click button to open modal
         btn.click();
 
-        // Wait for modal to appear (max 3 seconds)
+        // Wait for modal/panel to appear (max 2 seconds for right-side panel)
         let modal = null;
         for (let attempt = 0; attempt < 20; attempt++) {
-          await new Promise(r => setTimeout(r, 150));
+          await new Promise(r => setTimeout(r, 100));
           modal = document.querySelector('.content-sheet') ||
                   document.querySelector('[data-content-sheet-section]') ||
                   document.querySelector('[data-testid="modal-search-results"]') ||
-                  document.querySelector('[role="dialog"]');
+                  document.querySelector('[role="dialog"]') ||
+                  document.querySelector('[class*="sheet"]') ||
+                  document.querySelector('[class*="panel"]') ||
+                  document.querySelector('[class*="sidebar"]');
           if (modal) break;
+        }
+
+        // Wait a bit more for content to load
+        if (modal) {
+          await new Promise(r => setTimeout(r, 300));
         }
 
         if (!modal) {
@@ -85,10 +93,11 @@ javascript:(function() {
           citationsByIndex[idx] = [];
           const closeAnyModal = document.querySelector('button[data-silk*="a16"]') ||
                                 document.querySelector('[data-testid="close-button"]') ||
-                                document.querySelector('button[aria-label*="Close"]');
+                                document.querySelector('button[aria-label*="Close"]') ||
+                                document.querySelector('[aria-label*="close"]');
           if (closeAnyModal) {
             closeAnyModal.click();
-            await new Promise(r => setTimeout(r, 150));
+            await new Promise(r => setTimeout(r, 100));
           }
           continue;
         }
@@ -142,12 +151,18 @@ javascript:(function() {
 
         citationsByIndex[idx] = citations;
 
+        // Debug log
+        console.log(`Sources button ${idx}: extracted ${citations.length} citations`);
+
         // Close modal
-        const closeBtn = modal.querySelector('[data-testid="close-button"]');
+        const closeBtn = modal.querySelector('[data-testid="close-button"]') ||
+                        modal.querySelector('[aria-label*="Close"]') ||
+                        modal.querySelector('[aria-label*="close"]') ||
+                        modal.querySelector('button[class*="close"]');
         if (closeBtn) {
           closeBtn.click();
         }
-        await new Promise(r => setTimeout(r, 250));
+        await new Promise(r => setTimeout(r, 150));
       }
 
       if (progressDiv) {
@@ -167,6 +182,145 @@ javascript:(function() {
 
       const clone = main.cloneNode(true);
       const seenImageSrcs = [];
+
+      // Convert utility classes to inline styles for portability
+      clone.querySelectorAll('*').forEach(function(el) {
+        // Skip if no className or if it's not a string (e.g., SVG elements)
+        if (!el.className || typeof el.className !== 'string') return;
+
+        const classes = el.className.split(' ');
+        const styles = [];
+        const existingStyle = el.getAttribute('style') || '';
+
+        classes.forEach(function(c) {
+          // Flexbox
+          if (c === 'flex') styles.push('display:flex');
+          if (c === 'flex-col') styles.push('flex-direction:column');
+          if (c === 'flex-row') styles.push('flex-direction:row');
+          if (c === 'flex-wrap') styles.push('flex-wrap:wrap');
+          if (c === 'flex-nowrap') styles.push('flex-wrap:nowrap');
+
+          // Alignment
+          if (c === 'items-start') styles.push('align-items:flex-start');
+          if (c === 'items-end') styles.push('align-items:flex-end');
+          if (c === 'items-center') styles.push('align-items:center');
+          if (c === 'justify-start') styles.push('justify-content:flex-start');
+          if (c === 'justify-end') styles.push('justify-content:flex-end');
+          if (c === 'justify-center') styles.push('justify-content:center');
+          if (c === 'justify-between') styles.push('justify-content:space-between');
+
+          // Width/Height
+          if (c === 'w-full') styles.push('width:100%');
+          if (c === 'h-full') styles.push('height:100%');
+          if (c === 'w-fit') styles.push('width:fit-content');
+          if (c.startsWith('max-w-')) {
+            const val = c.replace('max-w-', '');
+            if (val === 'full') styles.push('max-width:100%');
+            else if (val === 'none') styles.push('max-width:none');
+            // Handle CSS variable references - default to 48rem for readability
+            else if (val.includes('(--')) styles.push('max-width:48rem');
+            // Handle bracket notation like max-w-[var(...)]
+            else if (val.startsWith('[var(')) styles.push('max-width:70%');
+          }
+          if (c.startsWith('min-w-')) {
+            const val = c.replace('min-w-', '');
+            if (val === 'full') styles.push('min-width:100%');
+            else if (val === '0') styles.push('min-width:0');
+            // Handle CSS variable references - default to 100% for tables
+            else if (val.includes('(--')) styles.push('min-width:100%');
+          }
+
+          // Gap
+          if (c.startsWith('gap-')) {
+            const val = c.replace('gap-', '');
+            if (val === '1') styles.push('gap:0.25rem');
+            if (val === '2') styles.push('gap:0.5rem');
+            if (val === '3') styles.push('gap:0.75rem');
+            if (val === '4') styles.push('gap:1rem');
+          }
+
+          // Whitespace
+          if (c === 'whitespace-pre-wrap') styles.push('white-space:pre-wrap');
+          if (c === 'whitespace-nowrap') styles.push('white-space:nowrap');
+
+          // Display
+          if (c === 'block') styles.push('display:block');
+          if (c === 'inline') styles.push('display:inline');
+          if (c === 'inline-block') styles.push('display:inline-block');
+          if (c === 'hidden') styles.push('display:none');
+
+          // Position
+          if (c === 'relative') styles.push('position:relative');
+          if (c === 'absolute') styles.push('position:absolute');
+
+          // Text
+          if (c === 'text-left') styles.push('text-align:left');
+          if (c === 'text-right') styles.push('text-align:right');
+          if (c === 'text-center') styles.push('text-align:center');
+
+          // Padding
+          if (c.startsWith('p-')) {
+            const val = c.replace('p-', '');
+            if (val === '1') styles.push('padding:0.25rem');
+            if (val === '2') styles.push('padding:0.5rem');
+            if (val === '3') styles.push('padding:0.75rem');
+            if (val === '4') styles.push('padding:1rem');
+          }
+          if (c.startsWith('px-')) {
+            const val = c.replace('px-', '');
+            // Handle CSS variable references
+            if (val.includes('(--')) {
+              // Default to 1rem for thread content margin
+              styles.push('padding-left:1rem;padding-right:1rem');
+            } else {
+              if (val === '1') styles.push('padding-left:0.25rem;padding-right:0.25rem');
+              if (val === '2') styles.push('padding-left:0.5rem;padding-right:0.5rem');
+              if (val === '3') styles.push('padding-left:0.75rem;padding-right:0.75rem');
+              if (val === '4') styles.push('padding-left:1rem;padding-right:1rem');
+            }
+          }
+          if (c.startsWith('py-')) {
+            const val = c.replace('py-', '');
+            if (val === '1') styles.push('padding-top:0.25rem;padding-bottom:0.25rem');
+            if (val === '2') styles.push('padding-top:0.5rem;padding-bottom:0.5rem');
+            if (val === '3') styles.push('padding-top:0.75rem;padding-bottom:0.75rem');
+            if (val === '4') styles.push('padding-top:1rem;padding-bottom:1rem');
+          }
+          if (c.startsWith('pt-')) {
+            const val = c.replace('pt-', '');
+            if (val === '1') styles.push('padding-top:0.25rem');
+            if (val === '2') styles.push('padding-top:0.5rem');
+            if (val === '3') styles.push('padding-top:0.75rem');
+            if (val === '4') styles.push('padding-top:1rem');
+            // Skip pt-12 for now - causing issues with user bubbles
+          }
+
+          // Margin
+          if (c.startsWith('m-')) {
+            const val = c.replace('m-', '');
+            if (val === '1') styles.push('margin:0.25rem');
+            if (val === '2') styles.push('margin:0.5rem');
+            if (val === '3') styles.push('margin:0.75rem');
+            if (val === '4') styles.push('margin:1rem');
+            if (val === 'auto') styles.push('margin:auto');
+          }
+          if (c.startsWith('mx-')) {
+            const val = c.replace('mx-', '');
+            if (val === 'auto') styles.push('margin-left:auto;margin-right:auto');
+          }
+          if (c.startsWith('my-')) {
+            const val = c.replace('my-', '');
+            if (val === 'auto') styles.push('margin-top:auto;margin-bottom:auto');
+          }
+        });
+
+        if (styles.length > 0) {
+          let combined = existingStyle ? existingStyle + ';' + styles.join(';') : styles.join(';');
+          // Clean up double semicolons
+          combined = combined.replace(/;+/g, ';').replace(/^;/, '');
+          el.setAttribute('style', combined);
+        }
+      });
 
       // Preserve flex layouts for side-by-side images
       clone.querySelectorAll('div').forEach(function(div) {
@@ -207,9 +361,17 @@ javascript:(function() {
         }
       });
 
-      // Extract images from buttons (but not Sources buttons)
+      // Remove images from Sources buttons (favicons/previews we don't want)
+      clone.querySelectorAll('button[data-cgpt-source-index]').forEach(function(btn) {
+        const imgs = btn.querySelectorAll('img');
+        imgs.forEach(function(img) {
+          img.remove();
+        });
+      });
+
+      // Extract images from other buttons
       clone.querySelectorAll('button').forEach(function(btn) {
-        if (btn.querySelector('img') && !btn.textContent.includes('Sources')) {
+        if (btn.querySelector('img') && !btn.hasAttribute('data-cgpt-source-index')) {
           const img = btn.querySelector('img');
           if (img) {
             const div = document.createElement('div');
@@ -283,6 +445,8 @@ javascript:(function() {
           const idx = e.getAttribute('data-cgpt-source-index');
           const citations = JSON.parse(e.getAttribute('data-citations'));
 
+          console.log(`Replacing Sources button ${idx} with ${citations.length} citations`);
+
           if (citations && citations.length > 0) {
             const citId = 'cit-' + citIndex++;
             const displayType = 'Sources';
@@ -292,20 +456,29 @@ javascript:(function() {
             wrapper.className = 'cgpt-citations-wrapper';
             wrapper.style.cssText = 'margin:10px 0!important;';
 
-            // Create toggle button
+            // Create toggle button with inline onclick handler
             const toggle = document.createElement('div');
             toggle.className = 'cgpt-citations-toggle';
             toggle.setAttribute('data-target', citId);
             toggle.innerHTML = `<span class="cgpt-toggle-icon">▶</span> ${displayType} (${citations.length})`;
             toggle.style.cssText =
-              'font-weight:600;cursor:pointer;user-select:none;' +
-              'padding:4px 0;color:#374151;';
+              'font-weight:600!important;cursor:pointer!important;user-select:none!important;' +
+              'padding:8px 12px!important;color:#374151!important;' +
+              'background:#f3f4f6!important;border-radius:8px!important;' +
+              'display:inline-block!important;margin:8px 0!important;' +
+              'border:1px solid #d1d5db!important;transition:all 0.2s!important;';
+
+            // Add inline click handler for WordPress compatibility
+            toggle.setAttribute('onclick', `(function(el){var t=el.getAttribute('data-target');var l=document.getElementById(t);var i=el.querySelector('.cgpt-toggle-icon');if(l&&i){if(l.style.display==='none'||!l.style.display){l.style.display='block';i.textContent='▼'}else{l.style.display='none';i.textContent='▶'}}})(this)`);
 
             // Create links list
             const linksList = document.createElement('div');
             linksList.id = citId;
             linksList.className = 'cgpt-citations-list';
-            linksList.style.cssText = 'display:none;margin-top:5px;padding-left:16px;';
+            linksList.style.cssText =
+              'display:none!important;margin-top:8px!important;padding:12px!important;' +
+              'background:#ffffff!important;border:1px solid #e5e7eb!important;' +
+              'border-radius:6px!important;box-sizing:border-box!important;';
 
             citations.forEach(function(cit) {
               const a = document.createElement('a');
@@ -313,14 +486,20 @@ javascript:(function() {
               a.textContent = cit.title;
               a.target = '_blank';
               a.style.cssText =
-                'display:block!important;margin:3px 0!important;' +
-                'color:#1f2937!important;text-decoration:underline!important;';
+                'display:block!important;margin:6px 0!important;' +
+                'color:#2563eb!important;text-decoration:underline!important;' +
+                'font-size:0.95rem!important;line-height:1.5!important;' +
+                'padding:4px 0!important;word-wrap:break-word!important;';
               linksList.appendChild(a);
             });
 
             wrapper.appendChild(toggle);
             wrapper.appendChild(linksList);
             e.parentNode.replaceChild(wrapper, e);
+
+            console.log(`Created collapsible section with ID: ${citId}`);
+          } else {
+            console.log(`Skipping button ${idx} - no citations`);
           }
         }
       });
@@ -535,7 +714,7 @@ javascript:(function() {
 
       // ===== PHASE 7: GENERATE HTML FILE =====
 
-      const css = '.cgpt-export,.cgpt-export *{-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}.cgpt-export{font-family:-apple-system,BlinkMacSystemFont,sans-serif;margin:20px;line-height:1.6;color:#374151}.cgpt-export-title{font-size:1.8rem;margin:0 0 6px 0}.cgpt-export-meta{color:#6b7280;margin:0 0 8px 0;font-size:.9rem}.cgpt-export-sep{border:0;border-top:1px solid #e5e7eb;margin:10px 0 14px}.cgpt-export img{max-width:400px!important;height:auto!important;border-radius:8px;margin:10px 0!important;display:block!important}.cgpt-export pre{background:#f3f4f6;padding:12px;border-radius:6px;overflow:auto}.cgpt-export code{background:#f3f4f6;padding:2px 6px;border-radius:4px}.cgpt-export .whitespace-pre-wrap{white-space:pre-wrap}.cgpt-export a[href^="http"]{background:#d1d5db!important;color:#1f2937!important;text-decoration:none!important;padding:1px 4px!important;border-radius:6px!important;font-size:0.75rem!important;display:inline-block!important;margin:2px!important;font-weight:500!important;border:1px solid #9ca3af!important}.cgpt-export a[href^="http"]:hover{background:#9ca3af!important}.cgpt-user-message-wrapper{display:flex!important;justify-content:flex-end!important;margin:40px 0 20px 0!important;width:100%!important}.cgpt-user-message-box{background:#ececec!important;border-radius:18px!important;padding:12px 16px!important;max-width:80%!important;text-align:left!important;word-wrap:break-word!important;box-shadow:0 1px 2px rgba(0,0,0,0.05)!important}.cgpt-user-message-box *{text-align:left!important;padding-top:0!important}.cgpt-user-message-box img{display:block!important;margin:10px 0 10px auto!important}.cgpt-citations-toggle:hover{color:#1f2937!important;opacity:0.8}.cgpt-toggle-icon{display:inline-block;transition:transform 0.2s;width:12px;text-align:center}.cgpt-citations-list{transition:all 0.3s ease}@media print{.cgpt-export,.cgpt-export *{-webkit-print-color-adjust:exact!important;color-adjust:exact!important;print-color-adjust:exact!important}.cgpt-export img{max-width:350px!important}.cgpt-export a[href^="http"]{background:#d1d5db!important;border:1px solid #9ca3af!important}.cgpt-user-message-box{background:#ececec!important}.cgpt-citations-list{display:block!important}}';
+      const css = '.cgpt-export{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif!important;margin:20px auto!important;line-height:1.6!important;color:#374151!important;max-width:100%!important;padding:0!important;box-sizing:border-box!important}.cgpt-export *{box-sizing:border-box!important}.cgpt-export-title{display:block!important;font-size:1.8rem!important;margin:0 0 6px 0!important;font-weight:600!important;color:#111!important;line-height:1.3!important;font-family:inherit!important}.cgpt-export-meta{display:block!important;color:#6b7280!important;margin:0 0 8px 0!important;font-size:.9rem!important;font-family:inherit!important;line-height:1.4!important}.cgpt-export-sep{display:block!important;border:0!important;border-top:1px solid #e5e7eb!important;margin:10px 0 14px!important;height:0!important}.cgpt-export img{max-width:400px!important;height:auto!important;border-radius:8px!important;margin:10px 0!important;display:block!important}.cgpt-export pre{background:#f3f4f6!important;padding:12px!important;border-radius:6px!important;overflow:auto!important;margin:10px 0!important;font-family:monospace!important;font-size:0.9em!important;line-height:1.5!important}.cgpt-export code{background:#f3f4f6!important;padding:2px 6px!important;border-radius:4px!important;font-family:monospace!important;font-size:0.9em!important}.cgpt-export .whitespace-pre-wrap{white-space:pre-wrap!important}.cgpt-export a[href^="http"]{background:#d1d5db!important;color:#1f2937!important;text-decoration:none!important;padding:1px 4px!important;border-radius:6px!important;font-size:0.75rem!important;display:inline-block!important;margin:2px!important;font-weight:500!important;border:1px solid #9ca3af!important;line-height:1.4!important}.cgpt-export a[href^="http"]:hover{background:#9ca3af!important;color:#111!important}.cgpt-user-message-wrapper{display:flex!important;justify-content:flex-end!important;margin:40px 0 20px 0!important;width:100%!important;clear:both!important}.cgpt-user-message-box{background:#ececec!important;border-radius:18px!important;padding:12px 16px!important;max-width:80%!important;text-align:left!important;word-wrap:break-word!important;box-shadow:0 1px 2px rgba(0,0,0,0.05)!important;color:#111!important;font-size:1rem!important;line-height:1.6!important;font-family:inherit!important}.cgpt-user-message-box *{text-align:left!important;color:inherit!important;font-family:inherit!important}.cgpt-user-message-box img{display:block!important;margin:10px 0 10px auto!important}.cgpt-citations-wrapper{display:block!important;margin:10px 0!important;padding:0!important}.cgpt-citations-toggle{display:inline-block!important;font-weight:600!important;cursor:pointer!important;user-select:none!important;padding:8px 12px!important;color:#374151!important;font-size:0.95rem!important;line-height:1.5!important;background:#f3f4f6!important;border-radius:8px!important;border:1px solid #d1d5db!important;font-family:inherit!important;margin:8px 0!important}.cgpt-citations-toggle:hover{background:#e5e7eb!important;color:#1f2937!important}.cgpt-toggle-icon{display:inline-block!important;width:12px!important;text-align:center!important;margin-right:4px!important;font-family:inherit!important}.cgpt-citations-list{display:none!important;margin:8px 0!important;padding:12px!important;background:#ffffff!important;border:1px solid #e5e7eb!important;border-radius:6px!important;box-sizing:border-box!important}.cgpt-citations-list a{display:block!important;margin:6px 0!important;color:#2563eb!important;text-decoration:underline!important;font-size:0.95rem!important;line-height:1.5!important;padding:4px 0!important;word-wrap:break-word!important;font-family:inherit!important}.cgpt-citations-list a:hover{color:#1d4ed8!important}.cgpt-export h1,.cgpt-export h2,.cgpt-export h3,.cgpt-export h4,.cgpt-export h5,.cgpt-export h6{font-weight:600!important;color:#111!important;line-height:1.3!important;margin-top:1.5em!important;margin-bottom:0.5em!important;font-family:inherit!important}.cgpt-export h3{font-size:1.25em!important}.cgpt-export strong{font-weight:600!important}.cgpt-export em{font-style:italic!important}.cgpt-export p{margin-bottom:1em!important}.cgpt-export ul,.cgpt-export ol{margin:10px 0!important;padding-left:20px!important}.cgpt-export li{margin:5px 0!important;line-height:1.6!important}.cgpt-export blockquote{margin:10px 0!important;padding:10px 20px!important;border-left:4px solid #d1d5db!important;background:#f9fafb!important}@media print{.cgpt-export img{max-width:350px!important}.cgpt-user-message-box{background:#ececec!important}.cgpt-citations-list{display:block!important}}';
 
       const title = document.title || 'ChatGPT Conversation';
       const dt = new Date();
@@ -559,12 +738,13 @@ javascript:(function() {
 
       const fragment = `<div class="cgpt-export"><h1 class="cgpt-export-title">${title}</h1><p class="cgpt-export-meta">Exported: ${dt.toLocaleString()}</p><hr class="cgpt-export-sep"><div class="cgpt-export-body">${clone.innerHTML}</div><style>${css}</style></div>`;
 
-      const barCSS = '#cgpt-copy-bar{position:sticky;top:0;z-index:2147483647;background:#0f172a;color:#fff;padding:10px 12px;border-bottom:1px solid #334155;font:14px/1.4 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,sans-serif}#cgpt-copy-bar .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}#cgpt-copy-bar .title{font-weight:700;margin-right:10px}#cgpt-copy-bar button{background:#10b981;border:none;color:#0b1324;font-weight:600;border-radius:6px;padding:8px 12px;cursor:pointer}#cgpt-copy-bar button:hover{background:#0ea5e9;color:#02131f}#cgpt-copy-bar .note{opacity:.85}#cgpt-copy-bar .spacer{flex:1}#cgpt-copy-bar .close{margin-left:8px;background:#ef4444;color:#fff}#cgpt-copy-bar .close:hover{background:#dc2626}';
+      const barCSS = '#cgpt-toast{position:fixed;top:20px;right:20px;z-index:2147483647;background:#10b981;color:#fff;padding:12px 20px;border-radius:8px;font:14px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.3);opacity:0;transition:opacity 0.3s;pointer-events:none}#cgpt-toast.show{opacity:1}';
 
-      const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head><body><style>${barCSS}</style><div id="cgpt-copy-bar"><div class="row"><span class="title">Chat Export</span><button id="cgpt-copy-btn" onclick="window.CGPT_copy && window.CGPT_copy()">Copy for WordPress</button><span class="note">Copies only the export block; styles are scoped</span><span class="spacer"></span><button id="cgpt-close-btn" class="close" title="Dismiss" onclick="window.CGPT_close && window.CGPT_close()">✕</button></div></div>${fragment}<script>(function(){try{function pretty(t){return t.replace(/></g,">\\n<");}function legacyCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(_){}ta.remove();return ok}window.CGPT_copy=function(){var btn=document.getElementById("cgpt-copy-btn");var el=document.querySelector(".cgpt-export");if(!el)return;var t=pretty(el.outerHTML);if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){if(btn){btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy for WordPress"},1200)}}).catch(function(){if(legacyCopy(t)&&btn){btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy for WordPress"},1200)}})}else{if(legacyCopy(t)&&btn){btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy for WordPress"},1200)}}};window.CGPT_close=function(){var bar=document.getElementById("cgpt-copy-bar");if(bar)bar.remove()};document.querySelectorAll(".cgpt-citations-toggle").forEach(function(toggle){toggle.addEventListener("click",function(){var targetId=this.getAttribute("data-target");var list=document.getElementById(targetId);var icon=this.querySelector(".cgpt-toggle-icon");if(list&&icon){if(list.style.display==="none"){list.style.display="block";icon.textContent="▼"}else{list.style.display="none";icon.textContent="▶"}}})})}catch(e){console.error(e)}})();<\/script></body></html>`;
+      // HTML with keyboard shortcut for WordPress workflow
+      const standaloneHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><link rel="canonical" href=""><meta name="robots" content="index,follow"><script>document.querySelector('link[rel="canonical"]').href=window.location.href;</script></head><body style="margin:0;padding:0;overflow:hidden"><style>${barCSS}</style><div id="cgpt-toast"></div>${fragment}<script>(function(){try{function showToast(msg){var toast=document.getElementById("cgpt-toast");if(toast){toast.textContent=msg;toast.classList.add("show");setTimeout(function(){toast.classList.remove("show")},2000)}}function legacyCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(_){}ta.remove();return ok}function copyIframe(){var url=window.location.href;var iframeHtml='<iframe src="'+url+'" scrolling="no" style="width:100%;border:none;min-height:600px;overflow:hidden" onload="this.style.height=(this.contentWindow.document.body.scrollHeight+20)+\\'px\\'"><\\/iframe>';if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(iframeHtml).then(function(){showToast("✓ iframe code copied!")}).catch(function(){if(legacyCopy(iframeHtml)){showToast("✓ iframe code copied!")}})}else{if(legacyCopy(iframeHtml)){showToast("✓ iframe code copied!")}}}document.addEventListener("keydown",function(e){if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(e.key==="C"||e.key==="c")){e.preventDefault();copyIframe()}});document.querySelectorAll(".cgpt-citations-toggle").forEach(function(toggle){toggle.addEventListener("click",function(){var targetId=this.getAttribute("data-target");var list=document.getElementById(targetId);var icon=this.querySelector(".cgpt-toggle-icon");if(list&&icon){if(list.style.display==="none"||!list.style.display){list.style.display="block";icon.textContent="▼"}else{list.style.display="none";icon.textContent="▶"}}})})}catch(e){console.error("Script error:",e)}})();</script></body></html>`;
 
-      // Download the file
-      const blob = new Blob([fullHtml], { type: 'text/html;charset=utf-8' });
+      // Download the standalone file (what gets uploaded to WordPress)
+      const blob = new Blob([standaloneHtml], { type: 'text/html;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = fname;
