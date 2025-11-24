@@ -343,8 +343,7 @@
         </div>
 
         <div class="footer">
-            <p><a href="https://emrahdiril.com">Emrah Diril</a> &copy; 2025</p>
-            <p>Created with ✨ & ❤️</p>
+            <p>🌘<a href="https://emrahdiril.com">Emrah Diril</a> &copy; 2025. All Rights Reserved.</p>
         </div>
     </div>
 
