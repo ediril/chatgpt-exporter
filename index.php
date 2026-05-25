@@ -297,7 +297,7 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
 <body>
     <div class="container">
         <div class="header">
-            <h1>Conversation Exporter</h1>
+            <h1>AI Chat Exporter</h1>
             <p>Export ChatGPT and Claude conversations</p>
         </div>
 
