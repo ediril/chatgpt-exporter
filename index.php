@@ -1,9 +1,13 @@
+<?php
+const CHATGPT_HTML_BOOKMARKLET_VERSION = '0.11.23.1';
+const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT Conversation Exporter</title>
+    <title>Conversation Exporter</title>
     <style>
         * {
             margin: 0;
@@ -159,6 +163,15 @@
             cursor: grabbing;
         }
 
+        .bookmarklet-version {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            line-height: 1;
+            opacity: 0.75;
+        }
+
         .drag-hint {
             margin-top: 15px;
             color: #6b7280;
@@ -284,8 +297,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>ChatGPT Conversation Exporter</h1>
-            <p>Export your ChatGPT conversations as clean PDFs or HTML</p>
+            <h1>Conversation Exporter</h1>
+            <p>Export ChatGPT and Claude conversations</p>
         </div>
 
         <div class="content">
@@ -297,16 +310,18 @@
                 <p>Drag one or both buttons to your browser's bookmarks bar:</p>
                 <br>
                 <?php
-                $bookmarkletCode = @file_get_contents(__DIR__ . '/dist/pdf_bookmarklet.js');
-                ?>
-                <a href="<?php echo htmlspecialchars(trim($bookmarkletCode)); ?>" class="bookmarklet">
-                     Export ChatGPT to PDF
-                </a>
-                <?php
                 $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/dist/html_bookmarklet.js');
                 ?>
                 <a href="<?php echo htmlspecialchars(trim($bookmarkletHtmlCode)); ?>" class="bookmarklet">
                     Export ChatGPT to HTML
+                    <span class="bookmarklet-version">v<?php echo htmlspecialchars(CHATGPT_HTML_BOOKMARKLET_VERSION); ?></span>
+                </a>
+                <?php
+                $bookmarkletClaudeMarkdownCode = @file_get_contents(__DIR__ . '/dist/claude_markdown_bookmarklet.js');
+                ?>
+                <a href="<?php echo htmlspecialchars(trim($bookmarkletClaudeMarkdownCode)); ?>" class="bookmarklet">
+                    Export Claude to Markdown
+                    <span class="bookmarklet-version">v<?php echo htmlspecialchars(CLAUDE_MARKDOWN_BOOKMARKLET_VERSION); ?></span>
                 </a>
             </div>
 
@@ -315,30 +330,29 @@
                     <span class="step-number">2</span>
                     Use the Bookmarklet
                 </h2>
-                <p>Navigate to any ChatGPT conversation and click either bookmarklet in your bookmarks bar. The tool will:</p>
+                <p>Navigate to a supported conversation and click the matching bookmarklet in your bookmarks bar. The tool will:</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
-                    <li>Clean up the page formatting</li>
+                    <li>Extract the conversation content</li>
                     <li>Remove unnecessary UI elements</li>
-                    <li>Optimize images for printing</li>
-                    <li>Prepare a clean export for saving or printing</li>
+                    <li>Prepare a clean export file</li>
                 </ul>
             </div>
 
             <div class="step">
                 <h2>
                     <span class="step-number">3</span>
-                    Save or Print
+                    Save the Export
                 </h2>
                 <p>Depending on which bookmarklet you used, you can:</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
-                    <li><strong>Export to HTML:</strong> A self-contained <code>.html</code> file downloads to your computer</li>
-                    <li><strong>Export to PDF:</strong> A print dialog opens; choose "Save as PDF" or print directly</li>
+                    <li><strong>Export ChatGPT to HTML:</strong> A self-contained <code>.html</code> file downloads to your computer</li>
+                    <li><strong>Export Claude to Markdown:</strong> A <code>.md</code> file downloads to your computer</li>
                 </ul>
             </div>
 
             <div class="warning">
                 <h3>Browser Compatibility</h3>
-                <p>This bookmarklet works best in Chrome, Firefox, Safari, and Edge. Some browsers may block popups - make sure to allow popups for ChatGPT when prompted.</p>
+                <p>This bookmarklet works best in Chrome, Firefox, Safari, and Edge.</p>
             </div>
         </div>
 

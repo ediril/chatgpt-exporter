@@ -1,6 +1,6 @@
-# ChatGPT Conversation Exporter
+# Conversation Exporter
 
-Export your ChatGPT conversations as clean PDFs or HTML files.
+Export ChatGPT conversations as HTML files and Claude conversations as Markdown files.
 
 ## Development
 
@@ -21,11 +21,11 @@ npm run build
 This will:
 1. Read the source bookmarklets from the root directory:
    - `html_bookmarklet.js` (original, readable)
-   - `pdf_bookmarklet.js` (original, readable)
+   - `claude_markdown_bookmarklet.js` (original, readable)
 
 2. Generate obfuscated versions in `dist/`:
    - `dist/html_bookmarklet.js` (obfuscated)
-   - `dist/pdf_bookmarklet.js` (obfuscated)
+   - `dist/claude_markdown_bookmarklet.js` (obfuscated)
 
 3. `index.php` automatically loads the obfuscated versions from `dist/`
 
@@ -33,16 +33,16 @@ This will:
 
 - **Source files** (keep in git):
   - `html_bookmarklet.js` - Original HTML exporter
-  - `pdf_bookmarklet.js` - Original PDF exporter
+  - `claude_markdown_bookmarklet.js` - Claude Markdown exporter
   - `build.js` - Build script for obfuscation
 
 - **Generated files** (excluded from git):
   - `dist/html_bookmarklet.js` - Obfuscated HTML exporter
-  - `dist/pdf_bookmarklet.js` - Obfuscated PDF exporter
+  - `dist/claude_markdown_bookmarklet.js` - Obfuscated Claude Markdown exporter
 
 ### Workflow
 
-1. Edit the source bookmarklets (`html_bookmarklet.js`, `pdf_bookmarklet.js`)
+1. Edit the source bookmarklets (`html_bookmarklet.js`, `claude_markdown_bookmarklet.js`)
 2. Run `npm run build` to generate obfuscated versions
 3. Test with `index.php` (uses the obfuscated versions)
 4. Commit only the source files, not the `dist/` folder
