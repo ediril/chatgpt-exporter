@@ -357,7 +357,7 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
         </div>
 
         <div class="footer">
-            <p>🌘<a href="https://emrahdiril.com">Emrah Diril</a> &copy; 2025. All Rights Reserved.</p>
+            <p>🌘<a href="https://emrahdiril.com">Emrah Diril</a> &copy; 2025-2026. All Rights Reserved.</p>
         </div>
     </div>
 
