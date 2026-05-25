@@ -1,24 +1,24 @@
 {
-  "name": "chatgpt-export",
+  "name": "claude-export",
   "version": "1.0.0",
   "description": "",
-  "main": "html_bookmarklet.js",
+  "main": "claude_markdown_bookmarklet.js",
   "scripts": {
     "build": "node build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ediril/chatgpt-exporter.git"
+    "url": "git+https://github.com/ediril/ai-chat-exporter.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/ediril/chatgpt-exporter/issues"
+    "url": "https://github.com/ediril/ai-chat-exporter/issues"
   },
-  "homepage": "https://github.com/ediril/chatgpt-exporter#readme",
+  "homepage": "https://github.com/ediril/ai-chat-exporter#readme",
   "devDependencies": {
     "javascript-obfuscator": "^4.1.1"
   }

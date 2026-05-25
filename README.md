@@ -1,52 +1,38 @@
-# Conversation Exporter
+# AI Chat Exporter
 
-Export ChatGPT conversations as HTML files and Claude conversations as Markdown files.
+Two bookmarklet exporters, deployed as separate pages:
+
+- `chatgpt-export/` exports ChatGPT conversations as self-contained HTML files.
+- `claude-export/` exports Claude conversations as Markdown files.
 
 ## Development
 
 ### Setup
 
 ```bash
-npm install
+cd chatgpt-export && npm install
+cd ../claude-export && npm install
 ```
 
 ### Building
 
-The project uses obfuscated JavaScript for the bookmarklets in production. To build the obfuscated versions:
+Each project uses obfuscated JavaScript for its production bookmarklet. Build each page from its own folder:
 
 ```bash
 npm run build
 ```
 
-This will:
-1. Read the source bookmarklets from the root directory:
-   - `html_bookmarklet.js` (original, readable)
-   - `claude_markdown_bookmarklet.js` (original, readable)
-
-2. Generate obfuscated versions in `dist/`:
-   - `dist/html_bookmarklet.js` (obfuscated)
-   - `dist/claude_markdown_bookmarklet.js` (obfuscated)
-
-3. `index.php` automatically loads the obfuscated versions from `dist/`
+The build reads the source bookmarklet from the project folder and writes the obfuscated version to that project's `dist/` directory. Each `index.php` loads its own generated file from `dist/`.
 
 ### Files
 
-- **Source files** (keep in git):
-  - `html_bookmarklet.js` - Original HTML exporter
-  - `claude_markdown_bookmarklet.js` - Claude Markdown exporter
-  - `build.js` - Build script for obfuscation
+- `chatgpt-export/html_bookmarklet.js` - ChatGPT HTML exporter source.
+- `claude-export/claude_markdown_bookmarklet.js` - Claude Markdown exporter source.
+- `*/build.js` - Project-local build script for obfuscation.
+- `*/index.php` - Project-local install page.
 
-- **Generated files** (excluded from git):
-  - `dist/html_bookmarklet.js` - Obfuscated HTML exporter
-  - `dist/claude_markdown_bookmarklet.js` - Obfuscated Claude Markdown exporter
-
-### Workflow
-
-1. Edit the source bookmarklets (`html_bookmarklet.js`, `claude_markdown_bookmarklet.js`)
-2. Run `npm run build` to generate obfuscated versions
-3. Test with `index.php` (uses the obfuscated versions)
-4. Commit only the source files, not the `dist/` folder
+Generated `dist/` files are excluded from git.
 
 ## Usage
 
-Visit `index.php` in your browser and drag the bookmarklets to your bookmarks bar.
+Visit the relevant project's `index.php` page and drag its bookmarklet to your bookmarks bar.

@@ -37,9 +37,8 @@ const obfuscatorOptions = {
   unicodeEscapeSequence: false
 };
 
-// Files to obfuscate
+// File to obfuscate
 const files = [
-  { input: 'html_bookmarklet.js', output: 'html_bookmarklet.js' },
   { input: 'claude_markdown_bookmarklet.js', output: 'claude_markdown_bookmarklet.js' }
 ];
 

@@ -1,5 +1,4 @@
 <?php
-const CHATGPT_HTML_BOOKMARKLET_VERSION = '0.11.23.1';
 const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
 ?>
 <!DOCTYPE html>
@@ -7,7 +6,7 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat Exporter</title>
+    <title>Claude Markdown Exporter</title>
     <style>
         * {
             margin: 0;
@@ -297,25 +296,18 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
 <body>
     <div class="container">
         <div class="header">
-            <h1>AI Chat Exporter</h1>
-            <p>Export ChatGPT and Claude conversations</p>
+            <h1>Claude Markdown Exporter</h1>
+            <p>Export Claude conversations to Markdown files</p>
         </div>
 
         <div class="content">
             <div class="step">
                 <h2>
                     <span class="step-number">1</span>
-                    Install the Bookmarklets
+                    Install the Bookmarklet
                 </h2>
-                <p>Drag one or both buttons to your browser's bookmarks bar:</p>
+                <p>Drag this button to your browser's bookmarks bar:</p>
                 <br>
-                <?php
-                $bookmarkletHtmlCode = @file_get_contents(__DIR__ . '/dist/html_bookmarklet.js');
-                ?>
-                <a href="<?php echo htmlspecialchars(trim($bookmarkletHtmlCode)); ?>" class="bookmarklet">
-                    Export ChatGPT to HTML
-                    <span class="bookmarklet-version">v<?php echo htmlspecialchars(CHATGPT_HTML_BOOKMARKLET_VERSION); ?></span>
-                </a>
                 <?php
                 $bookmarkletClaudeMarkdownCode = @file_get_contents(__DIR__ . '/dist/claude_markdown_bookmarklet.js');
                 ?>
@@ -330,7 +322,7 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
                     <span class="step-number">2</span>
                     Use the Bookmarklet
                 </h2>
-                <p>Navigate to a supported conversation and click the matching bookmarklet in your bookmarks bar. The tool will:</p>
+                <p>Navigate to a Claude conversation on claude.ai and click the bookmarklet in your bookmarks bar. The tool will:</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
                     <li>Extract the conversation content</li>
                     <li>Remove unnecessary UI elements</li>
@@ -343,10 +335,10 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
                     <span class="step-number">3</span>
                     Save the Export
                 </h2>
-                <p>Depending on which bookmarklet you used, you can:</p>
+                <p>The bookmarklet downloads a <code>.md</code> file to your computer.</p>
                 <ul style="margin: 15px 0; padding-left: 20px;">
-                    <li><strong>Export ChatGPT to HTML:</strong> A self-contained <code>.html</code> file downloads to your computer</li>
-                    <li><strong>Export Claude to Markdown:</strong> A <code>.md</code> file downloads to your computer</li>
+                    <li>Keep the conversation in plain Markdown</li>
+                    <li>Use the file in editors, notes apps, or documentation workflows</li>
                 </ul>
             </div>
 
