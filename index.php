@@ -7,7 +7,7 @@ const CLAUDE_MARKDOWN_BOOKMARKLET_VERSION = '0.5.24.3';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversation Exporter</title>
+    <title>AI Chat Exporter</title>
     <style>
         * {
             margin: 0;
